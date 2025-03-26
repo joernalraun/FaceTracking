@@ -12,32 +12,13 @@ namespace faceTracking {
     let roll = 0
     let mouth = 0
 
-    // Default servo pins
-    let yawServoPin = AnalogPin.P0
-    let pitchServoPin = AnalogPin.P1
-
-    /**
-     * Set the pin for Yaw servo
-     * @param pin the analog pin to use for Yaw servo
-     */
-    //% block="Set Yaw Servo Pin to %pin"
-    //% pin.fieldEditor="gridpicker"
-    //% pin.fieldOptions.columns=4
-    //% pin.fieldOptions.tooltips="false"
-    export function setYawServoPin(pin: AnalogPin) {
-        yawServoPin = pin
-    }
-
-    /**
-     * Set the pin for Pitch servo
-     * @param pin the analog pin to use for Pitch servo
-     */
-    //% block="Set Pitch Servo Pin to %pin"
-    //% pin.fieldEditor="gridpicker"
-    //% pin.fieldOptions.columns=4
-    //% pin.fieldOptions.tooltips="false"
-    export function setPitchServoPin(pin: AnalogPin) {
-        pitchServoPin = pin
+    // Automatic Bluetooth UART setup
+    function initBluetoothUART() {
+        bluetooth.startUartService()
+        bluetooth.onUartDataReceived(serial.delimiters(Delimiters.NewLine), function () {
+            receivedString = bluetooth.uartReadUntil(serial.delimiters(Delimiters.NewLine))
+            parseReceivedData()
+        })
     }
 
     /**
@@ -47,6 +28,7 @@ namespace faceTracking {
     //% draggable=true
     export function onBluetoothConnected() {
         basic.showIcon(IconNames.Happy)
+        initBluetoothUART()
     }
 
     /**
@@ -59,34 +41,9 @@ namespace faceTracking {
     }
 
     /**
-     * Starts Bluetooth UART Service
-     */
-    //% block="Start Bluetooth UART Service"
-    //% draggable=true
-    export function startBluetoothService() {
-        basic.showIcon(IconNames.Square)
-        bluetooth.startUartService()
-        basic.showIcon(IconNames.SmallSquare)
-    }
-
-    /**
-     * Sets up UART data received handler
-     */
-    //% block="Setup UART Data Received"
-    //% draggable=true
-    export function setupUartDataReceived() {
-        bluetooth.onUartDataReceived(serial.delimiters(Delimiters.NewLine), function () {
-            receivedString = bluetooth.uartReadUntil(serial.delimiters(Delimiters.NewLine))
-            parseReceivedData()
-        })
-    }
-
-    /**
      * Parses the received Bluetooth data
      */
-    //% block="Parse Received Bluetooth Data"
-    //% draggable=true
-    export function parseReceivedData() {
+    function parseReceivedData() {
         x = parseFloat(receivedString.substr(0, 2))
         y = parseFloat(receivedString.substr(2, 2))
         z = parseFloat(receivedString.substr(4, 2))
@@ -98,82 +55,159 @@ namespace faceTracking {
 
     /**
      * Maps Yaw to Servo on selected Pin
+     * @param pin the analog pin to use for Yaw servo
      */
-    //% block="Map Yaw to Servo"
-    //% draggable=true
-    export function mapYawToServo() {
-        pins.servoWritePin(yawServoPin, Math.map(yaw, 0, 10, 180, 0))
+    //% block="Map Yaw to Servo on pin %pin"
+    //% pin.fieldEditor="gridpicker"
+    //% pin.fieldOptions.columns=3
+    //% pin.fieldOptions.tooltips=true
+    //% pin.fieldOptions.width=200
+    //% pin.fieldOptions.group="Supported Pins"
+    export function mapYawToServo(pin: number = 0) {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
+        
+        // Convert pin to AnalogPin with validation
+        let analogPin: AnalogPin;
+        switch(pin) {
+            case 0: analogPin = AnalogPin.P0; break;
+            case 1: analogPin = AnalogPin.P1; break;
+            case 2: analogPin = AnalogPin.P2; break;
+            case 4: analogPin = AnalogPin.P4; break;
+            case 10: analogPin = AnalogPin.P10; break;
+            case 16: analogPin = AnalogPin.P16; break;
+            case 18: analogPin = AnalogPin.P18; break;
+            default: analogPin = AnalogPin.P0; break;
+        }
+        
+        pins.servoWritePin(analogPin, Math.map(yaw, 0, 10, 180, 0))
     }
 
     /**
      * Maps Pitch to Servo on selected Pin
+     * @param pin the analog pin to use for Pitch servo
      */
-    //% block="Map Pitch to Servo"
-    //% draggable=true
-    export function mapPitchToServo() {
-        pins.servoWritePin(pitchServoPin, Math.map(pitch, 10, 100, 0, 90))
+    //% block="Map Pitch to Servo on pin %pin"
+    //% pin.fieldEditor="gridpicker"
+    //% pin.fieldOptions.columns=3
+    //% pin.fieldOptions.tooltips=true
+    //% pin.fieldOptions.width=200
+    //% pin.fieldOptions.group="Supported Pins"
+    export function mapPitchToServo(pin: number = 1) {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
+        
+        // Convert pin to AnalogPin with validation
+        let analogPin: AnalogPin;
+        switch(pin) {
+            case 0: analogPin = AnalogPin.P0; break;
+            case 1: analogPin = AnalogPin.P1; break;
+            case 2: analogPin = AnalogPin.P2; break;
+            case 4: analogPin = AnalogPin.P4; break;
+            case 10: analogPin = AnalogPin.P10; break;
+            case 16: analogPin = AnalogPin.P16; break;
+            case 18: analogPin = AnalogPin.P18; break;
+            default: analogPin = AnalogPin.P1; break;
+        }
+        
+        pins.servoWritePin(analogPin, Math.map(pitch, 10, 100, 0, 90))
     }
 
     /**
-     * Returns the X value
+     * X Value
      */
-    //% block="Get X Value"
+    //% block="X Value"
     //% draggable=true
-    export function getX(): number {
+    export function X(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return x
     }
 
     /**
-     * Returns the Y value
+     * Y Value
      */
-    //% block="Get Y Value"
+    //% block="Y Value"
     //% draggable=true
-    export function getY(): number {
+    export function Y(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return y
     }
 
     /**
-     * Returns the Z value
+     * Z Value
      */
-    //% block="Get Z Value"
+    //% block="Z Value"
     //% draggable=true
-    export function getZ(): number {
+    export function Z(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return z
     }
 
     /**
-     * Returns the Yaw value
+     * Yaw Value
      */
-    //% block="Get Yaw Value"
+    //% block="Yaw Value"
     //% draggable=true
-    export function getYaw(): number {
+    export function Yaw(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return yaw
     }
 
     /**
-     * Returns the Pitch value
+     * Pitch Value
      */
-    //% block="Get Pitch Value"
+    //% block="Pitch Value"
     //% draggable=true
-    export function getPitch(): number {
+    export function Pitch(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return pitch
     }
 
     /**
-     * Returns the Roll value
+     * Roll Value
      */
-    //% block="Get Roll Value"
+    //% block="Roll Value"
     //% draggable=true
-    export function getRoll(): number {
+    export function Roll(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return roll
     }
 
     /**
-     * Returns the Mouth value
+     * Mouth Value
      */
-    //% block="Get Mouth Value"
+    //% block="Mouth Value"
     //% draggable=true
-    export function getMouth(): number {
+    export function Mouth(): number {
+        // Ensure UART is initialized
+        if (!bluetooth.isUartInitialized()) {
+            initBluetoothUART()
+        }
         return mouth
     }
+
+    // Automatically start UART service on load
+    initBluetoothUART()
 }
