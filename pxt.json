@@ -1,0 +1,30 @@
+{
+    "name": "FaceTracking",
+    "description": "",
+    "dependencies": {
+        "core": "*",
+        "bluetooth": "*",
+        "v3": "*"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "custom.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "branch": "v7.0.3",
+        "tag": "v7.0.3",
+        "commits": "https://github.com/microsoft/pxt-calliope/commits/283622410ab91b26f46d68145d9ea311cb8e91dd",
+        "target": "7.0.3",
+        "pxt": "10.2.39",
+        "targetId": "calliopemini"
+    },
+    "supportedTargets": [
+        "calliopemini"
+    ],
+    "preferredEditor": "blocksprj"
+}
