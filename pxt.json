@@ -26,5 +26,16 @@
     "supportedTargets": [
         "calliopemini"
     ],
-    "preferredEditor": "blocksprj"
+   "preferredEditor": "tsprj",
+    "yotta": {
+        "config": {
+            "microbit-dal": {
+                        "bluetooth": {
+                            "open": 1
+                        }
+                    }
+                }
+            }
+        ]
+    }
 }
