@@ -2,7 +2,7 @@
  * Custom blocks for Face-Tracking Bluetooth data processing
  */
 //% color="#AA5585" icon="\uf294"
-namespace faceTracking {
+namespace FaceTracking {
     let receivedString = ""
     let x = 0
     let y = 0
